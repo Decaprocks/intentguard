@@ -1,0 +1,44 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadResourcesAndMetrics",
+      "Effect": "Allow",
+      "Action": ["ec2:DescribeInstances", "cloudwatch:GetMetricStatistics"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "RegistryAndAudit",
+      "Effect": "Allow",
+      "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:Scan"],
+      "Resource": [
+        "arn:aws:dynamodb:REGION:ACCOUNT_ID:table/intentguard-intents",
+        "arn:aws:dynamodb:REGION:ACCOUNT_ID:table/intentguard-audit"
+      ]
+    },
+    {
+      "Sid": "LambdaLogGroup",
+      "Effect": "Allow",
+      "Action": "logs:CreateLogGroup",
+      "Resource": "arn:aws:logs:REGION:ACCOUNT_ID:*"
+    },
+    {
+      "Sid": "LambdaLogs",
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": "arn:aws:logs:REGION:ACCOUNT_ID:log-group:/aws/lambda/intentguard:*"
+    },
+    {
+      "Sid": "GracefulStopDisposableManagedInstances",
+      "Effect": "Allow",
+      "Action": "ec2:StopInstances",
+      "Resource": "arn:aws:ec2:REGION:ACCOUNT_ID:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:ResourceTag/IntentGuardManaged": "true",
+          "ec2:ResourceTag/IntentGuardDisposable": "true"
+        }
+      }
+    }
+  ]
+}
